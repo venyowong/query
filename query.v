@@ -20,6 +20,14 @@ pub mut:
 
 pub type Query = NoneQuery | EmptyQuery | BaseQuery | CompoundQuery
 
+pub fn Query.new(key string, ope Symbol, value string) Query {
+	return BaseQuery {
+		key: key
+		ope: ope
+		value: value
+	}
+}
+
 pub fn Query.parse(exp string) !Query {
 	if exp.len == 0 {
 		return EmptyQuery{}
@@ -38,6 +46,38 @@ pub fn (q1 Query) and(q2 Query) Query {
 }
 
 pub fn (q1 Query) or(q2 Query) Query {
+	return CompoundQuery {
+		left: q1
+		right: q2
+		ope: Symbol.or
+	}
+}
+
+pub fn (q1 BaseQuery) and(q2 Query) Query {
+	return CompoundQuery {
+		left: q1
+		right: q2
+		ope: Symbol.and
+	}
+}
+
+pub fn (q1 BaseQuery) or(q2 Query) Query {
+	return CompoundQuery {
+		left: q1
+		right: q2
+		ope: Symbol.or
+	}
+}
+
+pub fn (q1 CompoundQuery) and(q2 Query) Query {
+	return CompoundQuery {
+		left: q1
+		right: q2
+		ope: Symbol.and
+	}
+}
+
+pub fn (q1 CompoundQuery) or(q2 Query) Query {
 	return CompoundQuery {
 		left: q1
 		right: q2
