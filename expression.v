@@ -42,7 +42,7 @@ pub fn Expression.parse(exp string) !Expression {
 							}
 							`)` {
 								if parenthesis_level == 0 {
-									panic("unexpected symbols ) in pos $i of $exp")
+									return error("unexpected symbols ) in pos $i of $exp")
 								} else if parenthesis_level == 1 {
 									str := exp[(left_start_index+1)..i]
 									expression.expressions << Expression.parse(str)!
@@ -111,7 +111,7 @@ pub fn Expression.parse(exp string) !Expression {
 						}
 					}
 					else {
-						panic("parse error, invalid current_type: $current_type")
+						return error("parse error, invalid current_type: $current_type")
 					}
 				}
 				
@@ -134,7 +134,7 @@ pub fn Expression.parse(exp string) !Expression {
 				}
 			}
 			else {
-				panic("parse error, invalid expect_exp: $expect_exp")
+				return error("parse error, invalid expect_exp: $expect_exp")
 			}
 		}
 	}
@@ -147,12 +147,12 @@ pub fn Expression.parse(exp string) !Expression {
 	}
 	if left_start_index >= 0 { // if the end of expression is sub expression, should parse it and add expression to expression.expressions
 		if parenthesis_level != 0 {
-			panic("unable to find paired parentheses")
+			return error("unable to find paired parentheses")
 		}
 		expression.expressions << Expression.parse(exp[left_start_index+1..exp.len-1])!
 	}
 	if expression.expressions.len != expression.symbols.len + 1 {
-		panic("invalid expression: $expression.expressions.len $expression.symbols.len")
+		return error("invalid expression: $expression.expressions.len $expression.symbols.len")
 	}
 	if expression.symbols.len == 0 {
 		return expression.expressions[0]
@@ -172,6 +172,6 @@ fn parse_symbol(symbol string) !Symbol {
 		"&&" {return Symbol.and}
 		"in" {return Symbol.in}
 		"like" {return Symbol.like}
-		else {panic("invalid symbol: $symbol")}
+		else {return error("invalid symbol: $symbol")}
 	}
 }

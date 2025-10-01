@@ -1,5 +1,7 @@
 module query
 
+pub struct NoneQuery {}
+
 pub struct EmptyQuery {}
 
 pub struct BaseQuery {
@@ -16,7 +18,7 @@ pub mut:
 	ope Symbol
 }
 
-pub type Query = EmptyQuery | BaseQuery | CompoundQuery
+pub type Query = NoneQuery | EmptyQuery | BaseQuery | CompoundQuery
 
 pub fn Query.parse(exp string) !Query {
 	if exp.len == 0 {
@@ -28,7 +30,6 @@ pub fn Query.parse(exp string) !Query {
 }
 
 pub fn (q1 Query) and(q2 Query) Query {
-	println("$q1 and $q2")
 	return CompoundQuery {
 		left: q1
 		right: q2
@@ -37,7 +38,6 @@ pub fn (q1 Query) and(q2 Query) Query {
 }
 
 pub fn (q1 Query) or(q2 Query) Query {
-	println("$q1 or $q2")
 	return CompoundQuery {
 		left: q1
 		right: q2
@@ -78,7 +78,7 @@ fn expression_to_query(exp Expression) !Query {
 
 			for i := 0; i < len; {
 				if exp.symbols[i] != Symbol.or {
-					panic("unexpected symbol: ${exp.symbols[i]}")
+					return error("unexpected symbol: ${exp.symbols[i]}")
 				}
 
 				println(i)
